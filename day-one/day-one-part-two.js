@@ -18,18 +18,18 @@ function findIncreases(arr) {
     const sumArr = (arr) => arr
         .reduce((sum, curr) => sum + curr, 0)
 
-    const sums = []
-    for (let i = 1; i < arr.length - 1; i++) {
-        sums.push(sumArr([
+    let increasesCount = 0;
+    let prev = sumArr([ arr[0], arr[1], arr[2] ])
+    let curr;
+    for (let i = 2; i < arr.length - 1; i++) {
+        curr = sumArr([
             arr[i - 1],
             arr[i],
             arr[i + 1],
-        ]))
-    }
+        ])
 
-    let increasesCount = 0;
-    for (let i = 1; i < sums.length; i++) {
-        sums[i] > sums[i - 1] && increasesCount++
+        curr > prev && increasesCount++
+        prev = curr
     }
     return increasesCount;
 }
