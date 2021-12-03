@@ -1,3 +1,4 @@
+const { setTimeout } = require('timers/promises')
 const { input } = require('./input')
 
 // const input = [
@@ -13,14 +14,14 @@ const FORWARD = 'forward'
 const UP = 'up'
 const DOWN = 'down'
 
-function runInstructions(instructions) {
+async function runInstructions(instructions) {
     const position = {
         [FORWARD]: 0,
         depth: 0,
         aim: 0,
     }
 
-    for (const instruction of instructions) {
+    for (const [i, instruction] of instructions.entries()) {
         const [direction, amount] = instruction.split(' ')
         if (direction === FORWARD) {
             position[FORWARD] += +amount
@@ -32,10 +33,27 @@ function runInstructions(instructions) {
         else if (direction === UP) {
             position['aim'] -= +amount
         }
-        console.dir(position)
+        const rotor = i % 2 === 0 ? 'x' : 'X'
+        const bubble1 = i % 2 === 0 ? 'o' : 'O'
+        const bubble2 = i % 2 === 0 ? 'O' : 'o'
+        const drawing = `
+               _      Current Depth: ${position.depth}  
+           ___|___
+${bubble2}     ____/ o o o \\_____
+ ${bubble1}   /                  \\
+  ${rotor}-|     SANTAS SUB     |
+     \\__________________/
+
+`
+        console.clear()
+        console.log(drawing)
+        await setTimeout(100)
     }
 
     return position[FORWARD] * position['depth'];
 }
 
-console.log(runInstructions(input))
+runInstructions(input).then((output) => {
+    console.log(output)
+    process.exit(0)
+})
