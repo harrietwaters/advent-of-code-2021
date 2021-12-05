@@ -75,8 +75,7 @@ function findWinner(bs, nums) {
         }
     }
 
-    const lastBoardId = Array.from(remainingBoardIds)[0];
-    let firstWinForLastBoard = wins.find(w => w.id === lastBoardId)
+    let firstWinForLastBoard = wins[wins.length - 1]
     let unmarkedSpaceScore = firstWinForLastBoard.lines
         .flat()
         .filter((line) => !firstWinForLastBoard.hits.has(line))
