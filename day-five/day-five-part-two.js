@@ -17,50 +17,49 @@ function parsePairs(input) {
 
 const pairs = parsePairs(rawInput)
 
-function createTest(a, b) {
-    const deltaY = b[1] - a[1]
-    const minX = Math.min(a[0], b[0])
-    const maxX = Math.max(a[0], b[0])
-    const isInXBound = ([x, y]) => x >= minX && x <= maxX
-    if (deltaY === 0) {
-        return ([x, y]) => (y === a[1] && isInXBound([x, y]))
+function sortAsc(a, b) {
+    return a - b
+}
+
+function createLine(a, b) {
+    const deltaX = b[0] - a[0]
+    const [minY, maxY] = [a[1], b[1]].sort(sortAsc)
+    if (deltaX === 0) {
+        return function* () {
+            for (let y = minY; y <= maxY; y++) yield [a[0], y];
+        }
     }
 
-    const deltaX = b[0] - a[0]
-    const minY = Math.min(a[1], b[1])
-    const maxY = Math.max(a[1], b[1])
-    const isInYBound = ([x, y]) => y >= minY && y <= maxY
-    if (deltaX === 0) {
-        return ([x, y]) => x === a[0] && isInYBound([x, y])
+    const deltaY = b[1] - a[1]
+    const [minX, maxX] = [a[0], b[0]].sort(sortAsc)
+    if (deltaY === 0) {
+        return function* () {
+            for (let x = minX; x <= maxX; x++) yield [x, a[1]];
+        }
     }
 
     const m = deltaY / deltaX
     const c = -((m * a[0]) - a[1]);
-    return ([x, y]) => (
-        y === ((m * x) + c) &&
-        isInXBound([x, y]) &&
-        isInYBound([x, y])
-    );
-}
-
-function createMap(pairs) {
-    let testers = pairs.map(([a, b]) => createTest(a, b))
-
-    let map = [];
-    for (let x = 0; x <= 1000; x++) {
-        map.push([])
-        for (let y = 0; y <= 1000; y++) {
-            map[x][y] = 0
-            for (const tester of testers) {
-                if (tester([x, y])) map[x][y]++
-                if (map[x][y] === 2) break;
-            }
+    return function* () {
+        for (let x = minX; x <= maxX; x++) {
+            yield [x, (m * x) + c]
         }
     }
-
-    return map
 }
 
-const map = createMap(pairs)
-console.log(map.flat().filter(num => num === 2).length)
+function getOverlaps(input) {
+    const seen = new Set();
+    const dupes = new Set();
+    for (const [a, b] of input) {
+        const line = createLine(a, b)()
+        for (const point of line) {
+            const key = point.join(',');
+            seen.has(key) ? dupes.add(key) : seen.add(key);
+        }
+    }
+    return [dupes, seen]
+}
+
+const [dupes] = getOverlaps(pairs)
+console.log(dupes.size)
 // 17604
