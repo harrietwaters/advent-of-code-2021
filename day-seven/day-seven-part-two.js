@@ -6,29 +6,27 @@ function getCrabPositions(input) {
     const nums = input
         .split(',')
         .map(pos => +pos)
-        .sort((a,b) => a - b);
+        .sort((a, b) => a - b);
     return nums
 }
 
-function getCost(a, b) {
-    const distance = Math.abs(a - b)
-    return (distance * (distance + 1)) / 2
-}
-
 function findCheapestPosition(crabPos) {
-    const minPosition = crabPos[0]
-    const maxPosition = crabPos[crabPos.length - 1]
-    let cheapest = Number.MAX_SAFE_INTEGER
-    let pos
+    const minPosition = crabPos[0];
+    const maxPosition = crabPos[crabPos.length - 1];
+    let cheapest = Number.MAX_SAFE_INTEGER;
+    let cheapestPos;
+    positions:
     for (let i = minPosition; i <= maxPosition; i++) {
         let totalDistance = 0;
         for (const pos of crabPos) {
-            totalDistance += getCost(pos, i)
+            const distance = Math.abs(pos - i)
+            totalDistance += (distance * (distance + 1)) / 2
+            if (totalDistance > cheapest) continue positions;
         }
-        cheapest = Math.min(cheapest, totalDistance)
-        if (cheapest === totalDistance) pos = i
+        cheapest = totalDistance
+        cheapestPos = i
     }
-    return [pos, cheapest]
+    return [cheapestPos, cheapest]
 }
 
 const crabPositions = getCrabPositions(rawInput);
