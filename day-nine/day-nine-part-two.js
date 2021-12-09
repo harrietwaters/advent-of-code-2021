@@ -41,10 +41,8 @@ function* followBasin(y, x, rows) {
 function findBasins(rows) {
     let basins = []
     for (let y = 0; y < rows.length; y++) {
-        // for (let y = 0; y < 1; y++) {
         columns:
         for (let x = 0; x < rows[0].length; x++) {
-            // for (let x = 1; x < 2; x++) {
             const curr = rows[y][x];
             const adjacentLocations = getAdjacentLocations(y, x, rows);
             for (const location of adjacentLocations) {
