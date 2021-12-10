@@ -7,50 +7,41 @@ const PARENTHESIS = {
     CLOSE: ')',
 }
 
-const SQUARE_BRACKET = {
+const SQUARE = {
     OPEN: '[',
     CLOSE: ']',
 }
 
-const ANGLE_BRACKET = {
+const ANGLE = {
     OPEN: '<',
     CLOSE: '>',
 }
 
-const CURLY_BRACKET = {
+const CURLY = {
     OPEN: '{',
     CLOSE: '}',
 }
 
-const BRACKETS = [
-    PARENTHESIS,
-    SQUARE_BRACKET,
-    ANGLE_BRACKET,
-    CURLY_BRACKET,
-]
-
 const LOOKUP = {
     [PARENTHESIS.OPEN]: PARENTHESIS,
     [PARENTHESIS.CLOSE]: PARENTHESIS,
-    [SQUARE_BRACKET.OPEN]: SQUARE_BRACKET,
-    [SQUARE_BRACKET.CLOSE]: SQUARE_BRACKET,
-    [ANGLE_BRACKET.OPEN]: ANGLE_BRACKET,
-    [ANGLE_BRACKET.CLOSE]: ANGLE_BRACKET,
-    [CURLY_BRACKET.OPEN]: CURLY_BRACKET,
-    [CURLY_BRACKET.CLOSE]: CURLY_BRACKET,
+    [SQUARE.OPEN]: SQUARE,
+    [SQUARE.CLOSE]: SQUARE,
+    [ANGLE.OPEN]: ANGLE,
+    [ANGLE.CLOSE]: ANGLE,
+    [CURLY.OPEN]: CURLY,
+    [CURLY.CLOSE]: CURLY,
 }
 
 const POINTS = {
     [PARENTHESIS.CLOSE]: 3,
-    [SQUARE_BRACKET.CLOSE]: 57,
-    [CURLY_BRACKET.CLOSE]: 1197,
-    [ANGLE_BRACKET.CLOSE]: 25137,
+    [SQUARE.CLOSE]: 57,
+    [CURLY.CLOSE]: 1197,
+    [ANGLE.CLOSE]: 25137,
 }
 
 function parseInput(input) {
-    return input
-        .split('\n')
-        .map(line => line.replace(/\s+/, '').split(''))
+    return input .split('\n').map(line => line.replace(/\s+/, '').split(''))
 }
 
 function last(chars) {
@@ -71,13 +62,12 @@ function match(open, close) {
         LOOKUP[open].OPEN === LOOKUP[close].OPEN
 }
 
-function parseLine(chars) {
+function findCorruptedChar(chars) {
     const opens = []
-
     for (const char of chars) {
         if (isOpen(char)) {
             opens.push(char)
-        } else {
+        } else if (isClose(char)) {
             if (match(last(opens), char)) {
                 opens.pop();
             } else {
@@ -88,16 +78,14 @@ function parseLine(chars) {
 }
 
 function parseLines(lines) {
-    const errors = lines
-        .map(parseLine)
-        .filter(e => e != null)
-
+    const errors = lines.map(findCorruptedChar).filter(e => e != null)
     return errors;
 }
 
 function getPoints(errors) {
-    return errors
-        .reduce((acc, curr) => acc + POINTS[curr],0)
+    const calcLineScore = (acc, curr) => acc + POINTS[curr];
+    const score = errors.reduce(calcLineScore, 0);
+    return score;
 }
 
 const parsedInput = parseInput(rawInput)

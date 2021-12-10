@@ -7,44 +7,37 @@ const PARENTHESIS = {
     CLOSE: ')',
 }
 
-const SQUARE_BRACKET = {
+const SQUARE = {
     OPEN: '[',
     CLOSE: ']',
 }
 
-const ANGLE_BRACKET = {
+const ANGLE = {
     OPEN: '<',
     CLOSE: '>',
 }
 
-const CURLY_BRACKET = {
+const CURLY = {
     OPEN: '{',
     CLOSE: '}',
 }
 
-const BRACKETS = [
-    PARENTHESIS,
-    SQUARE_BRACKET,
-    ANGLE_BRACKET,
-    CURLY_BRACKET,
-]
-
 const LOOKUP = {
     [PARENTHESIS.OPEN]: PARENTHESIS,
     [PARENTHESIS.CLOSE]: PARENTHESIS,
-    [SQUARE_BRACKET.OPEN]: SQUARE_BRACKET,
-    [SQUARE_BRACKET.CLOSE]: SQUARE_BRACKET,
-    [ANGLE_BRACKET.OPEN]: ANGLE_BRACKET,
-    [ANGLE_BRACKET.CLOSE]: ANGLE_BRACKET,
-    [CURLY_BRACKET.OPEN]: CURLY_BRACKET,
-    [CURLY_BRACKET.CLOSE]: CURLY_BRACKET,
+    [SQUARE.OPEN]: SQUARE,
+    [SQUARE.CLOSE]: SQUARE,
+    [ANGLE.OPEN]: ANGLE,
+    [ANGLE.CLOSE]: ANGLE,
+    [CURLY.OPEN]: CURLY,
+    [CURLY.CLOSE]: CURLY,
 }
 
 const POINTS = {
     [PARENTHESIS.CLOSE]: 1,
-    [SQUARE_BRACKET.CLOSE]: 2,
-    [CURLY_BRACKET.CLOSE]: 3,
-    [ANGLE_BRACKET.CLOSE]: 4,
+    [SQUARE.CLOSE]: 2,
+    [CURLY.CLOSE]: 3,
+    [ANGLE.CLOSE]: 4,
 }
 
 function parseInput(input) {
@@ -73,7 +66,6 @@ function match(open, close) {
 
 function notCorrupted(chars) {
     const opens = []
-
     for (const char of chars) {
         if (isOpen(char)) {
             opens.push(char)
@@ -90,37 +82,28 @@ function notCorrupted(chars) {
 
 function findMissingChars(chars) {
     const opens = []
-
     for (const char of chars) {
-        console.log(char)
         if (isOpen(char)) opens.push(char)
         else opens.pop();
     }
 
-    const closes = opens
-        .reverse()
-        .map(char => LOOKUP[char].CLOSE)
-    return closes
+    const flip = char => LOOKUP[char].CLOSE
+    return opens.reverse().map(flip)
 }
 
 function parseLines(lines) {
-    const incompleteLines = lines
-        .filter(l => notCorrupted(l))
-
-
-    const missingChars = incompleteLines
-        .map(l => findMissingChars(l))
-    return missingChars;
+    const incompleteLines = lines.filter(notCorrupted)
+    const fixedLines = incompleteLines.map(findMissingChars)
+    return fixedLines;
 }
 
 function getPoints(lines) {
-    const scores = lines
-        .map(line => line.reduce((acc, curr) => (acc * 5) + POINTS[curr],0))
-        .sort((a,b) => a - b)
-
+    const calcLineScore = line => line.reduce((acc, curr) => (acc * 5) + POINTS[curr],0)
+    const scores = lines.map(calcLineScore).sort((a,b) => a - b)
     return scores[Math.floor(scores.length /2)]
 }
+
 const parsedInput = parseInput(rawInput)
-const incompleteLines = parseLines(parsedInput)
-const points = getPoints(incompleteLines)
+const fixedLines = parseLines(parsedInput)
+const points = getPoints(fixedLines)
 console.log(points)
