@@ -17,17 +17,17 @@ function isUpperCase(char) {
 
 function* visit(vertex, visited, vertices, allowMultiSmall) {
     visited.push(vertex)
-    if (vertex === END) {
-        yield Array.from(visited)
-    } else {
-        for (const adjacentVertex of vertices.get(vertex)) {
-            if (adjacentVertex === START) continue;
-            if (allowMultiSmall && visited.includes(adjacentVertex) && !isUpperCase(adjacentVertex)) {
-                yield* visit(adjacentVertex, Array.from(visited), vertices, false)
-            }
-            else if (!visited.includes(adjacentVertex) || isUpperCase(adjacentVertex)) {
-                yield* visit(adjacentVertex, Array.from(visited), vertices, allowMultiSmall)
-            }
+    for (const adjacentVertex of vertices.get(vertex)) {
+        if (adjacentVertex === END) {
+            yield visited.push(END)
+            continue;
+        }
+
+        if (allowMultiSmall && visited.includes(adjacentVertex) && !isUpperCase(adjacentVertex)) {
+            yield* visit(adjacentVertex, visited, vertices, false)
+        }
+        else if (!visited.includes(adjacentVertex) || isUpperCase(adjacentVertex)) {
+            yield* visit(adjacentVertex, Array.from(visited), vertices, allowMultiSmall)
         }
     }
 }
@@ -42,8 +42,8 @@ function findRoutes(routes) {
             vertices.set(end, [])
         }
 
-        vertices.get(start).push(end)
-        vertices.get(end).push(start)
+        if (end !== START) vertices.get(start).push(end)
+        if (start !== START) vertices.get(end).push(start)
     }
 
     let visited = []
