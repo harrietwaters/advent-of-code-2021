@@ -15,19 +15,15 @@ function isUpperCase(char) {
     return char.toUpperCase() === char
 }
 
-function* visit(vertex, visited, vertices, allowMultiSmall) {
+function visit(vertex, visited, vertices, results, allowMultiSmall) {
     visited.push(vertex)
     for (const adjacentVertex of vertices.get(vertex)) {
         if (adjacentVertex === END) {
-            yield visited.push(END)
-            continue;
-        }
-
-        if (allowMultiSmall && visited.includes(adjacentVertex) && !isUpperCase(adjacentVertex)) {
-            yield* visit(adjacentVertex, visited, vertices, false)
-        }
-        else if (!visited.includes(adjacentVertex) || isUpperCase(adjacentVertex)) {
-            yield* visit(adjacentVertex, Array.from(visited), vertices, allowMultiSmall)
+            results.push(visited)
+        } else if (allowMultiSmall && !isUpperCase(adjacentVertex) && visited.includes(adjacentVertex)) {
+            visit(adjacentVertex, visited, vertices, results, false)
+        } else if (isUpperCase(adjacentVertex) || !visited.includes(adjacentVertex)) {
+            visit(adjacentVertex, Array.from(visited), vertices, results, allowMultiSmall)
         }
     }
 }
@@ -47,7 +43,9 @@ function findRoutes(routes) {
     }
 
     let visited = []
-    return Array.from(visit(START, visited, vertices, true));
+    let results = []
+    visit(START, visited, vertices, results, true);
+    return results
 }
 
 const rows = parseRows(rawInput)
